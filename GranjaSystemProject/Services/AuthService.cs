@@ -23,10 +23,31 @@ public class AuthService
     {
         return BCrypt.Net.BCrypt.HashPassword(password, workFactor: BCryptCostFactor);
     }
+    public async Task<(bool Success, string Message)> RegisterUserAsync(User newUser)
+    {
+        try
+        {
+            var userExists = await _context.Users.AnyAsync(u => u.Email == newUser.Email);
+
+            if (userExists)
+            {
+                return (false, "Este e-mail já está cadastrado.");
+            }
+
+            newUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newUser.PasswordHash);
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
+
+            return (true, "Usuário cadastrado com sucesso!");
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Erro ao salvar: {ex.Message}");
+        }
+    }
     public async Task<User?> AuthenticateUser(string email, string password)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
 
         if (user == null)
             return null;
@@ -35,6 +56,8 @@ public class AuthService
         {
             return null;
         }
+
+        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
 
         if (isPasswordValid)
         {

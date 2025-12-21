@@ -16,6 +16,12 @@ public partial class LoginPage : ContentPage
         string email = EmailEntry.Text?.Trim();
         string password = PasswordEntry.Text?.Trim();
 
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            await DisplayAlert("Erro", "Email ou senha em branco!", "OK");
+            return;
+        }
+
         var user = await _authservice.AuthenticateUser(email, password);
 
         if (user is null)
@@ -28,5 +34,9 @@ public partial class LoginPage : ContentPage
 
         await SecureStorage.SetAsync("jwt_token", token);
         await Navigation.PushAsync(new HomePage());
+    }
+    private async void OnRegisteClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new RegisterPage());
     }
 }

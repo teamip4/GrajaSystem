@@ -11,6 +11,7 @@
         <Entry x:Name="PasswordEntry" Placeholder="Digite sua senha" IsPassword="True" />
 
         <Button Text="Entrar" Clicked="OnLoginClicked" />
+        <Button Text="Cadastrar" Clicked="OnRegisteClicked" />
     </VerticalStackLayout>
  
 </ContentPage>
